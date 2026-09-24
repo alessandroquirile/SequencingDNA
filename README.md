@@ -1,12 +1,12 @@
-# DNA Sequencing with Machine Learning
+# DNA Sequence Classification with Machine Learning
 
-This repository contains a Jupyter Notebook designed to introduce high school students to Machine Learning concepts through a practical example: **DNA sequencing**. 
+This repository contains a Jupyter Notebook designed to introduce high school students to Machine Learning concepts through a practical example: **DNA sequence classification**. 
 
-## 🧬 What is DNA Sequencing?
-DNA sequencing is the process of determining the exact order of nucleotides (A, T, C, G) in a DNA molecule. Scientists use sequencing to study genes, detect diseases, and understand how life works at a molecular level.
+## 🧬 What is DNA Sequence Classification?
+DNA sequence classification is the process of predicting the biological function or gene family of a known DNA sequence (such as identifying ion channels, transcription factors, or G-protein coupled receptors). Scientists use machine learning models to automatically annotate and categorize genetic sequences.
 
 ## 🤖 How Can Machine Learning Help?
-Machine Learning (ML) allows us to recognize patterns in DNA sequences, helping in tasks like identifying genetic mutations or classifying organisms. In this notebook, we break down the problem into simple steps that anyone can follow, even without prior programming experience!
+Machine Learning (ML) allows us to recognize sequence patterns (such as k-mer frequencies) in DNA, helping in tasks like classifying gene families or predicting gene function. In this notebook, we break down the problem into simple steps that anyone can follow, even without prior programming experience!
 
 ## 📚 What You Will Learn
 In this notebook, we explore:
