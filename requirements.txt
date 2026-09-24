@@ -28,7 +28,6 @@ fastjsonschema==2.21.1
 fire==0.7.0
 fonttools==4.55.3
 fqdn==1.5.1
-googletrans==3.1.0a0
 gprofiler-official==1.0.0
 h11==0.14.0
 h2==3.2.0
@@ -53,7 +52,6 @@ jupyter-contrib-core==0.4.2
 jupyter-events==0.11.0
 jupyter-highlight-selected-word==0.2.0
 jupyter-lsp==2.2.5
-jupyter-translate==2024.0.1
 jupyter_client==8.6.3
 jupyter_core==5.7.2
 jupyter_nbextensions_configurator==0.6.4
