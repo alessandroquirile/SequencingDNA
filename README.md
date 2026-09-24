@@ -37,7 +37,7 @@ In this notebook, we explore:
    ```
 3. Open the Jupyter Notebook:
     ```bash
-   jupyter notebook notebooks/dna-sequencing.ipynb
+   jupyter notebook notebooks/dna-classification.ipynb
    ```
 
 ## 🎯 Who Is This For?
