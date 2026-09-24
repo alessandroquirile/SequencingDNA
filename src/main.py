@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 CLASS_MAPPING = {
@@ -44,8 +44,8 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
 
-    # Train Naive Bayes Classifier
-    classifier = MultinomialNB()
+    # Train Logistic Regression Classifier
+    classifier = LogisticRegression(max_iter=1000)
     classifier.fit(X_train, y_train)
 
     # Predictions and Evaluation
@@ -55,7 +55,7 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
 
-    print("\n--- Model Performance Evaluation ---")
+    print("\n--- Model Performance Evaluation (Logistic Regression) ---")
     print(f"Accuracy:  {accuracy * 100:.2f}%")
     print(f"Precision: {precision * 100:.2f}%")
     print(f"Recall:    {recall * 100:.2f}%")
