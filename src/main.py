@@ -36,17 +36,19 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     # Generate 6-mers
     df['k-mers'] = df['sequence'].apply(lambda seq: get_kmers(seq, k))
 
-    # Feature extraction via Bag of Words
-    vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(df['k-mers'])
+    # Stratified Train-Test split FIRST (before vectorizer fit to avoid data leakage)
+    x_raw = df['k-mers'].values
     y = df['class'].values
-
-    print(f"Bag-of-Words feature matrix shape: {X.shape} ({X.shape[1]} unique {k}-mers)")
-
-    # Stratified Train-Test split
-    x_train, x_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state, stratify=y
+    x_train_raw, x_test_raw, y_train, y_test = train_test_split(
+        x_raw, y, test_size=test_size, random_state=random_state, stratify=y
     )
+
+    # Feature extraction via Bag of Words (fit on train only)
+    vectorizer = CountVectorizer()
+    x_train = vectorizer.fit_transform(x_train_raw)
+    x_test = vectorizer.transform(x_test_raw)
+
+    print(f"Bag-of-Words feature matrix shape: {x_train.shape} ({x_train.shape[1]} unique {k}-mers)")
 
     # Train Logistic Regression Classifier
     classifier = LogisticRegression(max_iter=1000)
