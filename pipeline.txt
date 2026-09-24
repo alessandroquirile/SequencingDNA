@@ -1,0 +1,96 @@
+===================================================================================
+                       DNA SEQUENCE CLASSIFICATION PIPELINE
+===================================================================================
+
+ [ 1. RAW DATA INPUT ]
+ +---------------------------------------------------------------------------------+
+ | File: data/raw/human.txt (4,380 DNA sequences)                                  |
+ | Format:                                                                         |
+ |   sequence                                        class                         |
+ |   ATGCCCCAACTAGGGGACACTGAT...                     4                             |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 2. PREPROCESSING & VALIDATION ]
+ +---------------------------------------------------------------------------------+
+ | A. Validate & Clean Sequences:                                                  |
+ |    - Uppercase, keep only ATCG nucleotides                                      |
+ |    - Remove empty/invalid sequences                                             |
+ |    Result: 4,380 valid sequences (0 removed)                                    |
+ |                                                                                 |
+ | B. Map Class IDs (0..6) to Descriptions:                                        |
+ |    0: G-protein receptors | 1: Tyrosine kinase   | 2: Tyrosine phosphatase      |
+ |    3: Synthetase          | 4: Synthase            | 5: Ion channel               |
+ |    6: Transcription factor                                                      |
+ |                                                                                 |
+ | C. Extract 6-mers (sliding window of length k=6, step=1):                        |
+ |    Sequence: "ATGCCCCAA..."                                                     |
+ |    Tokens  : ['ATGCCC', 'TGCCCC', 'GCCCCA', 'CCCCAA', ...]                      |
+ |    Joined  : "ATGCCC TGCCCC GCCCCA CCCCAA ..."                                  |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 3. STRATIFIED TRAIN / TEST SPLIT (before vectorizer fit - NO DATA LEAKAGE) ]
+ +---------------------------------------------------------------------------------+
+ | train_test_split(test_size=0.2, random_state=42, stratify=y)                    |
+ |                                                                                 |
+ |  +-----------------------------------+   +-----------------------------------+  |
+ |  | Training Set (80%): 3,504 samples |   | Test Set (20%): 876 samples       |  |
+ |  +-----------------------------------+   +-----------------------------------+  |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 4. FEATURE EXTRACTION (BAG-OF-WORDS, fit on TRAIN only) ]
+ +---------------------------------------------------------------------------------+
+ | CountVectorizer (Vocabulary of unique 6-mers from training set):                |
+ |                                                                                 |
+ |              [ 'AAAAAA', 'AAAAAC', ..., 'TTTTTT' ]  (4,096 Unique 6-mers)        |
+ | Sequence 1   [     0,        2,    ...,     1    ]                              |
+ | Sequence 2   [     1,        0,    ...,     0    ]                              |
+ |   ...                                                                           |
+ | Matrix Shape: (3504 train x 4096 features) | (876 test x 4096 features)         |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 5. MODEL TRAINING ]
+ +---------------------------------------------------------------------------------+
+ | Classifier:                                                                     |
+ | LogisticRegression(max_iter=5000, solver='lbfgs', random_state=42)              |
+ | Model learns decision boundaries on X_train and y_train                         |
+ | Convergence: verified (n_iter < max_iter)                                       |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 6. CROSS-VALIDATION (5-fold StratifiedKFold) ]
+ +---------------------------------------------------------------------------------+
+ | StratifiedKFold(n_splits=5, shuffle=True, random_state=42)                      |
+ |                                                                                 |
+ | CV Accuracy: 87.96% (+/- 1.65%)                                                 |
+ +----------------------------------------+----------------------------------------+
+                                          |
+                                          v
+ [ 7. INFERENCE & EVALUATION ]
+ +---------------------------------------------------------------------------------+
+ | Predict on X_test: y_pred = model.predict(X_test)                               |
+ |                                                                                 |
+ | --- Weighted Metrics ---                                                         |
+ | Accuracy:  91.21%                                                                |
+ | Precision: 91.36% (weighted)                                                     |
+ | Recall:    91.21% (weighted)                                                     |
+ | F1-Score:  91.16% (weighted)                                                     |
+ |                                                                                 |
+ | --- Per-Class Metrics ---                                                        |
+ | Class                          Precision  Recall  F1-Score  Support             |
+ | G-protein receptors            0.9223    0.8962   0.9091      106               |
+ | Tyrosine kinase                0.9406    0.8879   0.9135      107               |
+ | Tyrosine phosphatase           0.9559    0.9286   0.9420       70               |
+ | Synthetase                     0.8993    0.9328   0.9158      134               |
+ | Synthase                       0.8768    0.8521   0.8643      142               |
+ | Ion channel                    1.0000    0.7917   0.8837       48               |
+ | Transcription factor           0.8997    0.9665   0.9319      269               |
+ |                                                                                 |
+ | Macro avg                    0.9278    0.8937   0.9086      876               |
+ | Weighted avg                 0.9136    0.9121   0.9116      876               |
+ +---------------------------------------------------------------------------------+
+
+===================================================================================
