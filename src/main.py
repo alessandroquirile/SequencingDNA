@@ -1,10 +1,13 @@
 import os
+import re
+import warnings
 
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 
 CLASS_MAPPING = {
     0: 'Recettori accoppiati a proteine G',
@@ -17,12 +20,30 @@ CLASS_MAPPING = {
 }
 
 
+def clean_sequence(sequence: str) -> str:
+    """Clean DNA sequence: uppercase, keep only ATCG."""
+    return ''.join(c for c in sequence.upper() if c in 'ATCG')
+
+
+def validate_sequences(df: pd.DataFrame, col: str = 'sequence') -> pd.DataFrame:
+    """Validate and clean sequences, report invalid chars."""
+    original_len = len(df)
+    df = df.copy()
+    df[col] = df[col].apply(clean_sequence)
+    # Remove empty sequences after cleaning
+    df = df[df[col].str.len() > 0].reset_index(drop=True)
+    removed = original_len - len(df)
+    if removed:
+        warnings.warn(f"Removed {removed} sequences with invalid/empty nucleotides")
+    return df
+
+
 def get_kmers(sequence: str, k: int = 6) -> str:
     """Extract overlapping k-mers of length k from a sequence and join them with spaces."""
     return ' '.join([sequence[i:i + k] for i in range(len(sequence) - k + 1)])
 
 
-def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_state: int = 42):
+def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_state: int = 42, cv_folds: int = 5):
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"Data file not found at {data_path}")
 
@@ -30,10 +51,14 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     df = pd.read_table(data_path)
     print(f"Loaded {len(df)} DNA sequences from {data_path}")
 
+    # Validate and clean sequences (fix #5)
+    df = validate_sequences(df)
+    print(f"After cleaning: {len(df)} valid DNA sequences")
+
     # Map numerical class to description
     df['class_description'] = df['class'].map(CLASS_MAPPING)
 
-    # Generate 6-mers
+    # Generate k-mers
     df['k-mers'] = df['sequence'].apply(lambda seq: get_kmers(seq, k))
 
     # Stratified Train-Test split FIRST (before vectorizer fit to avoid data leakage)
@@ -50,9 +75,19 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
 
     print(f"Bag-of-Words feature matrix shape: {x_train.shape} ({x_train.shape[1]} unique {k}-mers)")
 
-    # Train Logistic Regression Classifier
-    classifier = LogisticRegression(max_iter=1000)
+    # Train Logistic Regression Classifier with convergence fix (fix #2)
+    classifier = LogisticRegression(max_iter=5000, solver='lbfgs', random_state=random_state)
     classifier.fit(x_train, y_train)
+
+    # Check convergence
+    if not classifier.n_iter_[0] < classifier.max_iter:
+        warnings.warn(f"LogisticRegression may not have converged (n_iter={classifier.n_iter_}, max_iter={classifier.max_iter})")
+
+    # Cross-validation (fix #3)
+    print(f"\n--- {cv_folds}-Fold Cross-Validation ---")
+    cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=random_state)
+    cv_scores = cross_val_score(classifier, x_train, y_train, cv=cv, scoring='accuracy')
+    print(f"CV Accuracy: {cv_scores.mean()*100:.2f}% (+/- {cv_scores.std()*100:.2f}%)")
 
     # Predictions and Evaluation
     y_pred = classifier.predict(x_test)
@@ -66,6 +101,11 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     print(f"Precision: {precision * 100:.2f}%")
     print(f"Recall:    {recall * 100:.2f}%")
     print(f"F1-Score:  {f1 * 100:.2f}%")
+
+    # Per-class metrics (fix #7 - added as bonus)
+    print("\n--- Per-Class Classification Report ---")
+    target_names = [CLASS_MAPPING[i] for i in sorted(CLASS_MAPPING.keys())]
+    print(classification_report(y_test, y_pred, target_names=target_names, digits=4))
 
 
 if __name__ == '__main__':
