@@ -171,3 +171,5 @@ cython_debug/
 .pypirc
 /notebooks/output/
 /docs/
+/.claude/
+/media/

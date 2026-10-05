@@ -23,7 +23,7 @@ In this notebook, we explore:
 2. **K-mer Counting**: Splitting DNA sequences into smaller overlapping pieces (k-mers) for feature extraction.
 3. **Bag-of-Words (BoW) Representation**: Converting DNA sequences into a numerical format that a machine learning model
    can understand.
-4. **Model Training & Validation**: Using the **Hold-Out Method** to test our model's performance.
+4. **Model Training & Validation**: Using the **Cross-Validation Method** to test our model's performance.
 
 ## 🚀 How to Use the Notebook
 
@@ -39,17 +39,4 @@ In this notebook, we explore:
     ```bash
    jupyter notebook notebooks/dna-classification.ipynb
    ```
-
-## 🎯 Who Is This For?
-
-- **High school students** curious about science and technology.
-- **Beginners in programming** who want a hands-on introduction to machine learning.
-- **Anyone interested in bioinformatics** and its real-world applications.
-- _The explanations are written in a **simplified and accessible language** to ensure that students with no prior
-  knowledge of programming or machine learning can follow along easily._
-
-## 💡 Why This Project?
-
-This notebook was created as an educational tool to **make Machine Learning accessible** to students with no prior
-programming knowledge. The explanations use simple, intuitive language to guide learners through the process step by
-step.
+   
