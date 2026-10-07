@@ -368,7 +368,7 @@ class DNAPipelineAnimation(Scene):
 
             self.play(
                 Transform(highlight, next_highlight),
-                UpdateFromFunc(feat_tag, lambda t: t.next_to(highlight, RIGHT, buff=0.3)),
+                UpdateFromFunc(feat_tag, lambda t: t.next_to(highlight, RIGHT, buff=0.5)),
                 run_time=0.8
             )
             self.wait(0.6)
