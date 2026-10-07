@@ -10,7 +10,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 0: Dataset Originale (human.txt)
         # ----------------------------------------------------
-        title0 = Text("0. Dataset Originale (human.txt)", font_size=24, color=WHITE)
+        title0 = Text("Data set", font_size=24, color=WHITE)
         title0.to_edge(UP, buff=0.4)
         self.play(Write(title0), run_time=1.2)
         self.wait(0.5)
@@ -41,17 +41,17 @@ class DNAPipelineAnimation(Scene):
             hdr.move_to([orig_table.get_columns()[j].get_center()[0], orig_table.get_top()[1] + 0.35, 0])
             col_headers_orig.add(hdr)
 
-        orig_shape = Text("4.380 sequenze di DNA (righe) × 2 colonne (sequence, class)", font_size=12, color=GRAY_B)
+        orig_shape = Text("4.380 sequenze di DNA (righe) × 2 colonne", font_size=12, color=GRAY_B)
         orig_shape.next_to(orig_table, DOWN, buff=0.3)
 
         class_legend_orig = VGroup(
-            Text("0: G-protein receptors", font_size=11, color=GRAY_A),
-            Text("1: Tyrosine kinase", font_size=11, color=GRAY_A),
-            Text("2: Tyrosine phosphatase", font_size=11, color=GRAY_A),
-            Text("3: Synthetase", font_size=11, color=GRAY_A),
-            Text("4: Synthase", font_size=11, color=GRAY_A),
-            Text("5: Ion channel", font_size=11, color=GRAY_A),
-            Text("6: Transcription factor", font_size=11, color=GRAY_A),
+            Text("0: Recettori accoppiati a proteine G", font_size=11, color=GRAY_A),
+            Text("1: Tirosin-chinasi", font_size=11, color=GRAY_A),
+            Text("2: Tirosina fosfatasi", font_size=11, color=GRAY_A),
+            Text("3: Sintetasi", font_size=11, color=GRAY_A),
+            Text("4: Sintasi", font_size=11, color=GRAY_A),
+            Text("5: Canale ionico", font_size=11, color=GRAY_A),
+            Text("6: Fattore di trascrizione", font_size=11, color=GRAY_A),
         ).arrange(DOWN, buff=0.1, aligned_edge=LEFT)
         class_legend_orig.next_to(orig_table, RIGHT, buff=0.4)
         class_title_orig = Text("Classi (0-6):", font_size=12, color=WHITE, weight=BOLD).next_to(class_legend_orig, UP,
@@ -61,7 +61,29 @@ class DNAPipelineAnimation(Scene):
         orig_table_group = VGroup(orig_table, col_headers_orig, class_legend_group_orig, orig_shape)
 
         self.play(FadeIn(orig_table_group), run_time=1.5)
-        self.wait(2.0)
+        self.wait(0.5)
+
+        # Evidenzia ogni riga del dataset
+        highlight_row = SurroundingRectangle(
+            orig_table.get_rows()[0],
+            color=YELLOW, buff=0.08, corner_radius=0.05
+        )
+        self.play(Create(highlight_row), run_time=0.8)
+        self.wait(0.5)
+
+        for i in range(1, len(orig_data)):
+            next_highlight = SurroundingRectangle(
+                orig_table.get_rows()[i],
+                color=YELLOW, buff=0.08, corner_radius=0.05
+            )
+            self.play(
+                Transform(highlight_row, next_highlight),
+                run_time=0.6
+            )
+            self.wait(0.4)
+
+        self.play(FadeOut(highlight_row), run_time=0.5)
+        self.wait(0.5)
 
         self.play(FadeOut(VGroup(title0, orig_table_group)), run_time=1.0)
         self.wait(0.5)
@@ -69,7 +91,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 1: Extract 6-mers (Sliding Window)
         # ----------------------------------------------------
-        title1 = Text("1. Preprocessing: Sliding Window (k=6, step=1)", font_size=24, color=WHITE)
+        title1 = Text("Determinare i k-mers (k=6, step=1)", font_size=24, color=WHITE)
         title1.to_edge(UP, buff=0.4)
         self.play(Write(title1), run_time=1.2)
         self.wait(0.5)
@@ -89,7 +111,7 @@ class DNAPipelineAnimation(Scene):
         self.play(FadeIn(dna_label), FadeIn(dna_full), run_time=1.2)
         self.wait(0.5)
 
-        tokens_label = Text("Token Estratti (6-meri):", font_size=18, color=GRAY_A).move_to(RIGHT * 2.5 + UP * 2.0)
+        tokens_label = Text("Esameri estratti:", font_size=18, color=GRAY_A).move_to(RIGHT * 2.5 + UP * 2.0)
         self.play(FadeIn(tokens_label), run_time=0.8)
         self.wait(0.3)
 
@@ -144,7 +166,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 1.5: Dataset Processato (k-meri joined + class)
         # ----------------------------------------------------
-        title_raw = Text("Dataset Processato (k-meri)", font_size=24, color=WHITE)
+        title_raw = Text("Data set processato", font_size=24, color=WHITE)
         title_raw.to_edge(UP, buff=0.4)
         self.play(Write(title_raw), run_time=1.2)
         self.wait(0.5)
@@ -175,17 +197,17 @@ class DNAPipelineAnimation(Scene):
             hdr.move_to([raw_table.get_columns()[j].get_center()[0], raw_table.get_top()[1] + 0.35, 0])
             col_headers_raw.add(hdr)
 
-        raw_shape = Text("4.380 righe × 2 colonne (k-mers + class)", font_size=12, color=GRAY_B)
+        raw_shape = Text("4.380 righe × 2 colonne", font_size=12, color=GRAY_B)
         raw_shape.next_to(raw_table, DOWN, buff=0.3)
 
         class_legend = VGroup(
-            Text("0: G-protein receptors", font_size=11, color=GRAY_A),
-            Text("1: Tyrosine kinase", font_size=11, color=GRAY_A),
-            Text("2: Tyrosine phosphatase", font_size=11, color=GRAY_A),
-            Text("3: Synthetase", font_size=11, color=GRAY_A),
-            Text("4: Synthase", font_size=11, color=GRAY_A),
-            Text("5: Ion channel", font_size=11, color=GRAY_A),
-            Text("6: Transcription factor", font_size=11, color=GRAY_A),
+            Text("0: Recettori accoppiati a proteine G", font_size=11, color=GRAY_A),
+            Text("1: Tirosin-chinasi", font_size=11, color=GRAY_A),
+            Text("2: Tirosina fosfatasi", font_size=11, color=GRAY_A),
+            Text("3: Sintetasi", font_size=11, color=GRAY_A),
+            Text("4: Sintasi", font_size=11, color=GRAY_A),
+            Text("5: Canale ionico", font_size=11, color=GRAY_A),
+            Text("6: Fattore di trascrizione", font_size=11, color=GRAY_A),
         ).arrange(DOWN, buff=0.1, aligned_edge=LEFT)
         class_legend.next_to(raw_table, RIGHT, buff=0.4)
         class_title = Text("Classi:", font_size=12, color=WHITE, weight=BOLD).next_to(class_legend, UP, buff=0.15)
@@ -202,7 +224,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 2: Stratified Train / Test Split
         # ----------------------------------------------------
-        title2 = Text("2. Stratified Split (80/20)", font_size=24, color=WHITE)
+        title2 = Text("Stratified Split (80/20)", font_size=24, color=WHITE)
         title2.to_edge(UP, buff=0.4)
         self.play(Write(title2), run_time=1.2)
         self.wait(0.5)
@@ -244,14 +266,14 @@ class DNAPipelineAnimation(Scene):
         self.wait(1.0)
 
         arrow_train = Arrow(train_block.get_bottom(), train_block.get_bottom() + DOWN * 1.2, color=GREEN_B, buff=0.15)
-        fit_transform_label = Text("fit_transform()", font="Monospace", font_size=15, color=GREEN_B).next_to(
+        fit_transform_label = Text("CountVectorizer.fit_transform()", font="Monospace", font_size=15, color=GREEN_B).next_to(
             arrow_train, RIGHT, buff=0.1)
-        train_bow_label = Text("x_train_bow", font_size=14, color=GREEN_B).next_to(arrow_train, DOWN, buff=0.15)
+        train_bow_label = Text("x_train_bow", font_size=20, color=GREEN_B).next_to(arrow_train, DOWN, buff=0.15)
 
         arrow_test = Arrow(test_block.get_bottom(), test_block.get_bottom() + DOWN * 1.2, color=RED_A, buff=0.15)
-        transform_label = Text("transform()", font="Monospace", font_size=15, color=RED_A).next_to(arrow_test, RIGHT,
+        transform_label = Text("CountVectorizer.transform()", font="Monospace", font_size=15, color=RED_A).next_to(arrow_test, RIGHT,
                                                                                                    buff=0.1)
-        test_bow_label = Text("x_test_bow", font_size=14, color=RED_A).next_to(arrow_test, DOWN, buff=0.15)
+        test_bow_label = Text("x_test_bow", font_size=20, color=RED_A).next_to(arrow_test, DOWN, buff=0.15)
 
         self.play(
             Create(arrow_train), Write(fit_transform_label), Write(train_bow_label),
@@ -262,7 +284,7 @@ class DNAPipelineAnimation(Scene):
 
         leakage_box = RoundedRectangle(corner_radius=0.1, width=8.5, height=0.8, color=GOLD, fill_color="#3a2e05",
                                        fill_opacity=0.9)
-        leakage_box.move_to(DOWN * 2.5)
+        leakage_box.move_to(DOWN * 3.0)
         leakage_text = Text(
             "NO DATA LEAKAGE: Il vocabolario viene appreso SOLO dal Training Set",
             font_size=15,
@@ -285,7 +307,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 3: Feature Extraction (Bag-of-Words Matrix)
         # ----------------------------------------------------
-        title3 = Text("3. Bag-of-Words (CountVectorizer)", font_size=24, color=WHITE)
+        title3 = Text("Bag-of-Words di training", font_size=24, color=WHITE)
         title3.to_edge(UP, buff=0.4)
         self.play(Write(title3), run_time=1.2)
         self.wait(0.5)
@@ -332,8 +354,8 @@ class DNAPipelineAnimation(Scene):
             matrix.get_rows()[0],
             color=YELLOW, buff=0.12, corner_radius=0.05
         )
-        feat_tag = Text("Vettore feature", font_size=13, color=YELLOW)
-        feat_tag.next_to(matrix, RIGHT, buff=0.5)
+        feat_tag = Text("Vettore delle feature", font_size=13, color=YELLOW)
+        feat_tag.next_to(highlight, RIGHT, buff=0.5)
 
         self.play(Create(highlight), FadeIn(feat_tag), run_time=1.0)
         self.wait(0.8)
@@ -343,12 +365,10 @@ class DNAPipelineAnimation(Scene):
                 matrix.get_rows()[i],
                 color=YELLOW, buff=0.12, corner_radius=0.05
             )
-            next_tag = Text("Vettore feature", font_size=13, color=YELLOW)
-            next_tag.next_to(matrix, RIGHT, buff=0.5)
 
             self.play(
                 Transform(highlight, next_highlight),
-                Transform(feat_tag, next_tag),
+                UpdateFromFunc(feat_tag, lambda t: t.next_to(highlight, RIGHT, buff=0.3)),
                 run_time=0.8
             )
             self.wait(0.6)
@@ -357,8 +377,8 @@ class DNAPipelineAnimation(Scene):
                                      fill_opacity=0.8)
         shape_box.move_to(DOWN * 1.9)
 
-        train_shape_tex = MathTex(r"\text{Train Matrix Shape}: (3504 \times 4096)", font_size=20, color=GREEN_B)
-        test_shape_tex = MathTex(r"\text{Test Matrix Shape}: (876 \times 4096)", font_size=20, color=RED_A)
+        train_shape_tex = MathTex(r"\text{x\_train\_bow.shape}: (3504 \times 4096)", font_size=20, color=GREEN_B)
+        test_shape_tex = MathTex(r"\text{x\_test\_bow.shape}: (876 \times 4096)", font_size=20, color=RED_A)
         shapes_vgroup = VGroup(train_shape_tex, test_shape_tex).arrange(DOWN, buff=0.15)
         shapes_vgroup.move_to(shape_box.get_center())
 
@@ -376,7 +396,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 4: Model Training (Logistic Regression - .fit())
         # ----------------------------------------------------
-        title4 = Text("4. Addestramento Modello (Logistic Regression - .fit())", font_size=24, color=WHITE)
+        title4 = Text("Addestramento Modello (LogisticRegression.fit())", font_size=24, color=WHITE)
         title4.to_edge(UP, buff=0.4)
         self.play(Write(title4), run_time=1.2)
         self.wait(0.5)
@@ -555,7 +575,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 5: 5-Fold Cross-Validation (StratifiedKFold)
         # ----------------------------------------------------
-        title5 = Text("5. Cross-Validation (5-Fold StratifiedKFold)", font_size=24, color=WHITE)
+        title5 = Text("Cross-Validation (5-Fold StratifiedKFold)", font_size=24, color=WHITE)
         title5.to_edge(UP, buff=0.4)
         self.play(Write(title5), run_time=1.2)
         self.wait(0.5)
@@ -723,7 +743,7 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE 6: Model Testing & Scikit-Learn Evaluation
         # ----------------------------------------------------
-        title6 = Text("6. Model Testing & Evaluation (sklearn.metrics)", font_size=22, color=WHITE)
+        title6 = Text("Testing del classificatore", font_size=22, color=WHITE)
         title6.to_edge(UP, buff=0.3)
         self.play(Write(title6), run_time=1.0)
         self.wait(0.3)
@@ -745,7 +765,7 @@ class DNAPipelineAnimation(Scene):
 
         ypred_box = RoundedRectangle(corner_radius=0.1, width=2.8, height=0.8, color=GOLD, fill_color="#3a2e05",
                                      fill_opacity=0.9)
-        ypred_txt = Text("y_pred = model.predict(X_test_bow)\n[4, 0, 3, 2, 6, 1, ...]", font_size=10, color=YELLOW)
+        ypred_txt = Text("y_pred = model.predict(x_test_bow)\n[4, 0, 3, 2, 6, 1, ...]", font_size=12, color=YELLOW)
         ypred_txt.move_to(ypred_box.get_center())
         ypred_group = VGroup(ypred_box, ypred_txt).move_to(RIGHT * 3.4 + UP * 2.0)
 
@@ -758,7 +778,7 @@ class DNAPipelineAnimation(Scene):
         # Step 2: Inserimento delle etichette reali y_test per il confronto
         ytest_box = RoundedRectangle(corner_radius=0.1, width=2.8, height=0.8, color=GREEN_B, fill_color="#1b4332",
                                      fill_opacity=0.9)
-        ytest_txt = Text("y_test (Ground Truth)\n[4, 0, 3, 2, 6, 4, ...]", font_size=10, color=GREEN_B)
+        ytest_txt = Text("y_test (Ground Truth)\n[4, 0, 3, 2, 6, 4, ...]", font_size=12, color=GREEN_B)
         ytest_txt.move_to(ytest_box.get_center())
         ytest_group = VGroup(ytest_box, ytest_txt).move_to(RIGHT * 3.4 + UP * 0.8)
 
@@ -766,29 +786,6 @@ class DNAPipelineAnimation(Scene):
         self.wait(0.8)
 
         # Step 3: Evidenziare le funzioni sklearn metrics
-        funcs_title = Text("Chiamata Funzioni Evaluation di Scikit-Learn:", font_size=12, color=GRAY_A,
-                           weight=BOLD).move_to(LEFT * 3.2 + UP * 0.9)
-
-        func1 = Text("accuracy_score(y_test, y_pred)", font="Monospace", font_size=11, color=WHITE)
-        func2 = Text("precision_score(y_test, y_pred, average='weighted')", font="Monospace", font_size=11,
-                     color=GREEN_B)
-        func3 = Text("recall_score(y_test, y_pred, average='weighted')", font="Monospace", font_size=11, color=BLUE_B)
-        func4 = Text("f1_score(y_test, y_pred, average='weighted')", font="Monospace", font_size=11, color=GOLD)
-
-        funcs_vgroup = VGroup(func1, func2, func3, func4).arrange(DOWN, buff=0.12, aligned_edge=LEFT)
-        funcs_vgroup.move_to(LEFT * 2.6 + DOWN * 0.1)
-
-        self.play(Write(funcs_title), FadeIn(funcs_vgroup, shift=RIGHT * 0.2), run_time=1.2)
-        self.wait(1.0)
-
-        # Frecce di input dalle etichette reali e predette verso le funzioni
-        eval_arrow1 = CurvedArrow(ytest_group.get_left(), funcs_vgroup.get_right() + UP * 0.2, angle=-0.3,
-                                  color=GREEN_B)
-        eval_arrow2 = CurvedArrow(ypred_group.get_left() + DOWN * 0.2, funcs_vgroup.get_right() + DOWN * 0.2,
-                                  angle=-0.4, color=GOLD)
-
-        self.play(Create(eval_arrow1), Create(eval_arrow2), run_time=0.8)
-        self.wait(1.0)
 
         # Step 4: Visualizzazione Risultati Pesati
         res_box = RoundedRectangle(corner_radius=0.1, width=12.2, height=0.8, color=TEAL, fill_color="#062c2d",
@@ -810,7 +807,7 @@ class DNAPipelineAnimation(Scene):
         self.play(
             FadeOut(VGroup(
                 xtest_group, model_test_group, predict_arrow, ypred_group, pred_out_arrow,
-                ytest_group, funcs_title, funcs_vgroup, eval_arrow1, eval_arrow2
+                ytest_group
             )),
             res_box.animate.move_to(UP * 2.1),
             res_group.animate.move_to(UP * 2.1),
@@ -819,13 +816,13 @@ class DNAPipelineAnimation(Scene):
 
         # Step 5: Tabella di Valutazione Dettagliata per Classe
         class_table_data = [
-            ["G-protein receptors", "0.9223", "0.8962", "0.9091", "106"],
-            ["Tyrosine kinase", "0.9406", "0.8879", "0.9135", "107"],
-            ["Tyrosine phosphatase", "0.9559", "0.9286", "0.9420", "70"],
-            ["Synthetase", "0.8993", "0.9328", "0.9158", "134"],
-            ["Synthase", "0.8768", "0.8521", "0.8643", "142"],
-            ["Ion channel", "1.0000", "0.7917", "0.8837", "48"],
-            ["Transcription factor", "0.8997", "0.9665", "0.9319", "269"],
+            ["Recettori accoppiati a proteine G", "0.9223", "0.8962", "0.9091", "106"],
+            ["Tirosin-chinasi", "0.9406", "0.8879", "0.9135", "107"],
+            ["Tirosina fosfatasi", "0.9559", "0.9286", "0.9420", "70"],
+            ["Sintetasi", "0.8993", "0.9328", "0.9158", "134"],
+            ["Sintasi", "0.8768", "0.8521", "0.8643", "142"],
+            ["Canale ionico", "1.0000", "0.7917", "0.8837", "48"],
+            ["Fattore di trascrizione", "0.8997", "0.9665", "0.9319", "269"],
             ["Macro Avg", "0.9278", "0.8937", "0.9086", "876"],
             ["Weighted Avg", "0.9136", "0.9121", "0.9116", "876"],
         ]
