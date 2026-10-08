@@ -313,10 +313,10 @@ class DNAPipelineAnimation(Scene):
         self.wait(0.5)
 
         matrix_data = [
-            ["0", "0", "...", "1"],
-            ["1", "0", "...", "0"],
-            ["...", "...", "...", "..."],
-            ["2", "0", "...", "1"]
+            ["0", "0", "0", "1", "0", "...", "1"],
+            ["1", "0", "0", "2", "0", "...", "0"],
+            ["...", "...", "...", "...", "...", "...", "..."],
+            ["2", "0", "1", "0", "0", "...", "1"]
         ]
 
         matrix = Matrix(
@@ -334,7 +334,7 @@ class DNAPipelineAnimation(Scene):
             lbl.move_to([matrix.get_left()[0] - 0.5, matrix.get_rows()[i].get_center()[1], 0])
             row_labels.add(lbl)
 
-        col_names = ["AAAAAA", "AAAAAC", "...", "TTTTTT"]
+        col_names = ["AAAAAA", "AAAAAC", "AAAAAG", "AAAAAT", "CAAAAA", "...", "TTTTTT"]
         col_headers = VGroup()
         for j, col_name in enumerate(col_names):
             hdr = Text(col_name, font="Monospace", font_size=14, color=TEAL)
@@ -354,7 +354,9 @@ class DNAPipelineAnimation(Scene):
             matrix.get_rows()[0],
             color=YELLOW, buff=0.12, corner_radius=0.05
         )
-        feat_tag = Text("Vettore delle feature", font_size=13, color=YELLOW)
+        # feat_tag = Text("Vettore delle feature", font_size=13, color=YELLOW)
+        feat_tag = MathTex(r"\text{Vettore delle feature } \mathbf{x}_i \in \mathbb{R}^{4096}",
+                           font_size=13, color=YELLOW)
         feat_tag.next_to(highlight, RIGHT, buff=0.5)
 
         self.play(Create(highlight), FadeIn(feat_tag), run_time=1.0)
@@ -468,7 +470,7 @@ class DNAPipelineAnimation(Scene):
         axes.move_to(LEFT * 2.6 + DOWN * 1.6)
         axes_labels = axes.get_axis_labels(
             x_label=Text("It", font_size=11, color=GRAY_A),
-            y_label=Text("Loss J(W)", font_size=11, color=GRAY_A)
+            y_label=Text("Loss J(W,b)", font_size=11, color=GRAY_A)
         )
         graph_group = VGroup(axes, axes_labels)
 
@@ -751,13 +753,13 @@ class DNAPipelineAnimation(Scene):
         # Step 1: Esecuzione di model.predict(X_test_bow)
         xtest_box = RoundedRectangle(corner_radius=0.1, width=3.0, height=0.8, color=RED_A, fill_color="#4a1521",
                                      fill_opacity=0.85)
-        xtest_txt = Text("X_test_bow\n(876 × 4096)", font_size=11, color=WHITE)
+        xtest_txt = Text("x_test_bow\n(876 × 4096)", font_size=11, color=WHITE)
         xtest_txt.move_to(xtest_box.get_center())
         xtest_group = VGroup(xtest_box, xtest_txt).move_to(LEFT * 4.8 + UP * 2.0)
 
         model_box_test = RoundedRectangle(corner_radius=0.1, width=3.2, height=0.8, color=BLUE_B, fill_color="#0d2b45",
                                           fill_opacity=0.9)
-        model_txt_test = Text("Classifier (Trained)\nmodel.predict()", font_size=11, color=WHITE, weight=BOLD)
+        model_txt_test = Text("Classificatore", font_size=11, color=WHITE, weight=BOLD)
         model_txt_test.move_to(model_box_test.get_center())
         model_test_group = VGroup(model_box_test, model_txt_test).move_to(LEFT * 0.8 + UP * 2.0)
 
@@ -846,7 +848,8 @@ class DNAPipelineAnimation(Scene):
         for idx, row in enumerate(class_table_data):
             y_pos = 0.85 - idx * 0.28
             is_avg_row = idx >= 7
-            row_color = GOLD if is_avg_row else WHITE
+            # row_color = GOLD if is_avg_row else WHITE
+            row_color = WHITE
 
             c_name = Text(row[0], font_size=10, color=row_color, weight=BOLD if is_avg_row else NORMAL).move_to(
                 LEFT * 4.2, aligned_edge=LEFT)
