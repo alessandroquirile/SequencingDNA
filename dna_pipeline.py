@@ -42,8 +42,8 @@ class DNAPipelineAnimation(Scene):
             color=BLUE_C, stroke_opacity=0.8, fill_color="#15202B", fill_opacity=0.9
         )
         ai_title = Text("Classificatore", font_size=15, color=WHITE, weight=BOLD)
-        ai_sub = MathTex(r"W, \mathbf{b}", font_size=12, color=BLUE_B)
-        ai_content = VGroup(ai_title, ai_sub).arrange(DOWN, buff=0.15)
+        # ai_sub = MathTex(r"W, \mathbf{b}", font_size=12, color=BLUE_B)
+        ai_content = VGroup(ai_title).arrange(DOWN, buff=0.15)
         ai_content.move_to(ai_box.get_center())
         center_group = VGroup(ai_box, ai_content).move_to(LEFT * 0.7 + UP * 0.1)
 

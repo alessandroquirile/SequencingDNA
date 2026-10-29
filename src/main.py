@@ -1,4 +1,5 @@
 import os
+import joblib
 
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -79,6 +80,19 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     print("\n--- Per-Class Classification Report ---")
     target_names = [CLASS_MAPPING[i] for i in sorted(CLASS_MAPPING.keys())]
     print(classification_report(y_test, y_pred, target_names=target_names, digits=4))
+
+    # Save trained model and vectorizer
+    models_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'models')
+    os.makedirs(models_dir, exist_ok=True)
+    model_path = os.path.join(models_dir, 'dna_classifier.joblib')
+    joblib.dump({
+        'classifier': classifier,
+        'vectorizer': vectorizer,
+        'class_mapping': CLASS_MAPPING,
+        'k': k
+    }, model_path)
+    print(f"\nModel and vectorizer saved to: {model_path}")
+    return classifier, vectorizer
 
 
 if __name__ == '__main__':
