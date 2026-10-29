@@ -19,22 +19,22 @@ class DNAPipelineAnimation(Scene):
         self.wait(0.5)
 
         # 1. BLOCCO SINISTRA: Sequenza DNA (Input)
-        dna_input_title = Text("Sequenza DNA (Input)", font_size=13, color=TEAL, weight=BOLD)
+        dna_input_title = Text("Sequenza 1 (Input)", font_size=13, color=TEAL, weight=BOLD)
 
-        raw_dna = "ATGCCCCAACTAAAT"
+        raw_dna_1 = "ATGCCCCAACTAAAT"
         nuc_colors = {"A": "#2ECC71", "C": "#3498DB", "G": "#F39C12", "T": "#E74C3C"}
-        dna_chars = VGroup(*[
+        dna_chars_1 = VGroup(*[
             Text(char, font="Monospace", font_size=17, color=nuc_colors.get(char, WHITE), weight=BOLD)
-            for char in raw_dna
+            for char in raw_dna_1
         ]).arrange(RIGHT, buff=0.08)
-        dna_dots_intro = Text("...", font="Monospace", font_size=17, color=GRAY_B).next_to(dna_chars, RIGHT, buff=0.08)
-        dna_seq_group = VGroup(dna_chars, dna_dots_intro)
+        dna_dots_1 = Text("...", font="Monospace", font_size=17, color=GRAY_B).next_to(dna_chars_1, RIGHT, buff=0.08)
+        dna_seq_group_1 = VGroup(dna_chars_1, dna_dots_1)
 
         dna_box = RoundedRectangle(
             corner_radius=0.1, width=3.4, height=1.1,
             color=TEAL, stroke_opacity=0.6, fill_color="#181818", fill_opacity=0.8
         )
-        dna_content = VGroup(dna_input_title, dna_seq_group).arrange(DOWN, buff=0.18)
+        dna_content = VGroup(dna_input_title, dna_seq_group_1).arrange(DOWN, buff=0.18)
         dna_content.move_to(dna_box.get_center())
         left_group = VGroup(dna_box, dna_content).move_to(LEFT * 4.3 + UP * 0.1)
 
@@ -65,13 +65,13 @@ class DNAPipelineAnimation(Scene):
 
         target_boxes = VGroup()
         for idx, name in classes_info:
-            c_num = Text(idx, font="Monospace", font_size=11, color=GOLD if idx == "4" else GRAY_B, weight=BOLD)
-            c_name = Text(name, font_size=10, color=WHITE if idx == "4" else GRAY_A)
+            c_num = Text(idx, font="Monospace", font_size=11, color=GRAY_B, weight=BOLD)
+            c_name = Text(name, font_size=10, color=GRAY_A)
             row_txt = VGroup(c_num, c_name).arrange(RIGHT, buff=0.15)
             row_bg = RoundedRectangle(
                 corner_radius=0.06, width=2.9, height=0.38,
-                color=GOLD if idx == "4" else GRAY_D,
-                stroke_opacity=0.6 if idx == "4" else 0.3,
+                color=GRAY_D,
+                stroke_opacity=0.3,
                 fill_color="#222222", fill_opacity=0.7
             )
             row_txt.move_to(row_bg.get_center())
@@ -89,57 +89,132 @@ class DNAPipelineAnimation(Scene):
         self.play(FadeIn(right_group, shift=LEFT * 0.3), run_time=1.0)
         self.wait(0.5)
 
-        # Animazione di scansione AI (lettura nucleotidi)
-        scan_line = Line(
-            dna_chars.get_top() + UP * 0.15,
-            dna_chars.get_bottom() + DOWN * 0.15,
+        # ----------------------------------------------------
+        # ESEMPIO 1: Sequenza 1 -> Classe 4 (Sintasi)
+        # ----------------------------------------------------
+        scan_line_1 = Line(
+            dna_chars_1.get_top() + UP * 0.15,
+            dna_chars_1.get_bottom() + DOWN * 0.15,
             color=YELLOW, stroke_width=3
         )
-        scan_line.move_to(dna_chars.get_left())
+        scan_line_1.move_to(dna_chars_1.get_left())
         scan_label = Text("Scansione nucleotidi...", font_size=11, color=YELLOW).next_to(dna_box, DOWN, buff=0.15)
 
-        self.play(Create(scan_line), FadeIn(scan_label), run_time=0.5)
-        self.play(scan_line.animate.move_to(dna_chars.get_right()), run_time=1.4)
-        self.play(FadeOut(scan_line), FadeOut(scan_label), run_time=0.4)
-        self.wait(0.3)
+        self.play(Create(scan_line_1), FadeIn(scan_label), run_time=0.4)
+        self.play(scan_line_1.animate.move_to(dna_chars_1.get_right()), run_time=1.2)
+        self.play(FadeOut(scan_line_1), FadeOut(scan_label), run_time=0.3)
 
-        # Feed into AI: freccia da sequenza ad AI
-        arrow_to_ai = Arrow(
+        # Feed into AI 1
+        arrow_to_ai_1 = Arrow(
             dna_box.get_right(), ai_box.get_left(),
             buff=0.1, color=TEAL, stroke_width=3, max_tip_length_to_length_ratio=0.25
         )
-        self.play(GrowArrow(arrow_to_ai), run_time=0.6)
-        self.play(Indicate(ai_box, color=YELLOW, scale_factor=1.05), run_time=0.8)
-        self.wait(0.3)
+        self.play(GrowArrow(arrow_to_ai_1), run_time=0.5)
+        self.play(Indicate(ai_box, color=YELLOW, scale_factor=1.05), run_time=0.6)
 
-        # Routing verso la Classe 4 (Sintasi)
+        # Routing verso Classe 4 (Sintasi)
         target_class_4 = target_boxes[4]
-        arrow_to_target = CurvedArrow(
+        arrow_to_target_1 = CurvedArrow(
             ai_box.get_right() + UP * 0.1,
             target_class_4.get_left(),
             angle=-0.25, color=GOLD, stroke_width=3.5
         )
 
-        pred_badge = RoundedRectangle(
+        pred_badge_1 = RoundedRectangle(
             corner_radius=0.08, width=2.9, height=0.38,
             color=GREEN, fill_color=GREEN, fill_opacity=0.25, stroke_width=2
         ).move_to(target_class_4.get_center())
 
-        pred_label = Text("✓ Predizione: Classe 4 (Sintasi)", font_size=12, color=GREEN, weight=BOLD)
-        pred_label.next_to(target_boxes, DOWN, buff=0.25)
+        pred_label_1 = Text("✓ Predizione: Classe 4 (Sintasi)", font_size=12, color=GREEN, weight=BOLD)
+        pred_label_1.next_to(target_boxes, DOWN, buff=0.25)
 
-        self.play(Create(arrow_to_target), run_time=0.8)
+        self.play(Create(arrow_to_target_1), run_time=0.7)
         self.play(
-            FadeIn(pred_badge),
+            FadeIn(pred_badge_1),
             target_class_4.animate.scale(1.08),
-            FadeIn(pred_label),
-            run_time=0.8
+            FadeIn(pred_label_1),
+            run_time=0.6
+        )
+        self.wait(1.0)
+
+        # ----------------------------------------------------
+        # ESEMPIO 2: Sequenza 2 -> Classe 0 (Recettori GPCR)
+        # ----------------------------------------------------
+        # Reset visivo esito Esempio 1
+        self.play(
+            FadeOut(arrow_to_ai_1),
+            FadeOut(arrow_to_target_1),
+            FadeOut(pred_badge_1),
+            FadeOut(pred_label_1),
+            target_class_4.animate.scale(1 / 1.08),
+            run_time=0.6
+        )
+
+        # Nuova sequenza di DNA (Sequenza 2)
+        dna_input_title_2 = Text("Sequenza 2 (Input)", font_size=13, color=TEAL, weight=BOLD)
+        raw_dna_2 = "ATGCCCAGTCCTGTC"
+        dna_chars_2 = VGroup(*[
+            Text(char, font="Monospace", font_size=17, color=nuc_colors.get(char, WHITE), weight=BOLD)
+            for char in raw_dna_2
+        ]).arrange(RIGHT, buff=0.08)
+        dna_dots_2 = Text("...", font="Monospace", font_size=17, color=GRAY_B).next_to(dna_chars_2, RIGHT, buff=0.08)
+        dna_seq_group_2 = VGroup(dna_chars_2, dna_dots_2)
+
+        dna_content_2 = VGroup(dna_input_title_2, dna_seq_group_2).arrange(DOWN, buff=0.18)
+        dna_content_2.move_to(dna_box.get_center())
+
+        self.play(Transform(dna_content, dna_content_2), run_time=0.7)
+        self.wait(0.3)
+
+        # Scansione sequenza 2
+        scan_line_2 = Line(
+            dna_chars_2.get_top() + UP * 0.15,
+            dna_chars_2.get_bottom() + DOWN * 0.15,
+            color=YELLOW, stroke_width=3
+        )
+        scan_line_2.move_to(dna_chars_2.get_left())
+        scan_label_2 = Text("Scansione nucleotidi...", font_size=11, color=YELLOW).next_to(dna_box, DOWN, buff=0.15)
+
+        self.play(Create(scan_line_2), FadeIn(scan_label_2), run_time=0.4)
+        self.play(scan_line_2.animate.move_to(dna_chars_2.get_right()), run_time=1.2)
+        self.play(FadeOut(scan_line_2), FadeOut(scan_label_2), run_time=0.3)
+
+        # Feed into AI 2
+        arrow_to_ai_2 = Arrow(
+            dna_box.get_right(), ai_box.get_left(),
+            buff=0.1, color=TEAL, stroke_width=3, max_tip_length_to_length_ratio=0.25
+        )
+        self.play(GrowArrow(arrow_to_ai_2), run_time=0.5)
+        self.play(Indicate(ai_box, color=YELLOW, scale_factor=1.05), run_time=0.6)
+
+        # Routing verso Classe 0 (Recettori GPCR - freccia curvata verso l'alto)
+        target_class_0 = target_boxes[0]
+        arrow_to_target_2 = CurvedArrow(
+            ai_box.get_right() + UP * 0.1,
+            target_class_0.get_left(),
+            angle=0.25, color=GOLD, stroke_width=3.5
+        )
+
+        pred_badge_2 = RoundedRectangle(
+            corner_radius=0.08, width=2.9, height=0.38,
+            color=GREEN, fill_color=GREEN, fill_opacity=0.25, stroke_width=2
+        ).move_to(target_class_0.get_center())
+
+        pred_label_2 = Text("✓ Predizione: Classe 0 (Recettori GPCR)", font_size=12, color=GREEN, weight=BOLD)
+        pred_label_2.next_to(target_boxes, DOWN, buff=0.25)
+
+        self.play(Create(arrow_to_target_2), run_time=0.7)
+        self.play(
+            FadeIn(pred_badge_2),
+            target_class_0.animate.scale(1.08),
+            FadeIn(pred_label_2),
+            run_time=0.6
         )
         self.wait(1.0)
 
         # Messaggio didattico di sintesi in basso
         summary_intro = Text(
-            "Input: Sequenza non etichettata  ➔  Output: Categoria biologica assegnata",
+            "L'AI analizza ogni sequenza e la smista nella classe funzionale corretta",
             font_size=13, color=WHITE
         ).to_edge(DOWN, buff=0.4)
         self.play(Write(summary_intro), run_time=1.0)
@@ -148,7 +223,7 @@ class DNAPipelineAnimation(Scene):
         # Pulizia scena prima di FASE 0
         intro_all = VGroup(
             intro_title, intro_subtitle, left_group, center_group, right_group,
-            arrow_to_ai, arrow_to_target, pred_badge, pred_label, summary_intro
+            arrow_to_ai_2, arrow_to_target_2, pred_badge_2, pred_label_2, summary_intro
         )
         self.play(FadeOut(intro_all), run_time=1.0)
         self.wait(0.5)
