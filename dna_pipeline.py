@@ -10,12 +10,10 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE INTRO: Cos'è la Classificazione del DNA?
         # ----------------------------------------------------
-        intro_title = Text("Cos'è la Classificazione del DNA?", font_size=24, color=WHITE)
+        intro_title = Text("Classificare sequenze di DNA", font_size=24, color=WHITE)
         intro_title.to_edge(UP, buff=0.4)
-        intro_subtitle = Text("Assegnare una sequenza di nucleotidi a una specifica classe funzionale", font_size=13, color=GRAY_A)
-        intro_subtitle.next_to(intro_title, DOWN, buff=0.15)
 
-        self.play(Write(intro_title), FadeIn(intro_subtitle), run_time=1.2)
+        self.play(Write(intro_title), run_time=1.2)
         self.wait(0.5)
 
         # 1. BLOCCO SINISTRA: Sequenza DNA (Input)
@@ -31,7 +29,7 @@ class DNAPipelineAnimation(Scene):
         dna_seq_group_1 = VGroup(dna_chars_1, dna_dots_1)
 
         dna_box = RoundedRectangle(
-            corner_radius=0.1, width=3.4, height=1.1,
+            corner_radius=0.1, width=3.8, height=1.1,
             color=TEAL, stroke_opacity=0.6, fill_color="#181818", fill_opacity=0.8
         )
         dna_content = VGroup(dna_input_title, dna_seq_group_1).arrange(DOWN, buff=0.18)
@@ -43,12 +41,9 @@ class DNAPipelineAnimation(Scene):
             corner_radius=0.15, width=2.4, height=1.6,
             color=BLUE_C, stroke_opacity=0.8, fill_color="#15202B", fill_opacity=0.9
         )
-        ai_title = Text("Modello AI", font_size=15, color=WHITE, weight=BOLD)
-        ai_sub = Text("Classificatore", font_size=12, color=BLUE_B)
-        ai_icon_dots = VGroup(*[
-            Dot(radius=0.05, color=c) for c in [TEAL, BLUE_B, GOLD, GREEN]
-        ]).arrange(RIGHT, buff=0.12)
-        ai_content = VGroup(ai_title, ai_sub, ai_icon_dots).arrange(DOWN, buff=0.15)
+        ai_title = Text("Classificatore", font_size=15, color=WHITE, weight=BOLD)
+        ai_sub = MathTex(r"W, \mathbf{b}", font_size=12, color=BLUE_B)
+        ai_content = VGroup(ai_title, ai_sub).arrange(DOWN, buff=0.15)
         ai_content.move_to(ai_box.get_center())
         center_group = VGroup(ai_box, ai_content).move_to(LEFT * 0.7 + UP * 0.1)
 
@@ -125,7 +120,7 @@ class DNAPipelineAnimation(Scene):
             color=GREEN, fill_color=GREEN, fill_opacity=0.25, stroke_width=2
         ).move_to(target_class_4.get_center())
 
-        pred_label_1 = Text("✓ Predizione: Classe 4 (Sintasi)", font_size=12, color=GREEN, weight=BOLD)
+        pred_label_1 = Text("Predizione: Sintasi", font_size=12, color=GREEN, weight=BOLD)
         pred_label_1.next_to(target_boxes, DOWN, buff=0.25)
 
         self.play(Create(arrow_to_target_1), run_time=0.7)
@@ -200,7 +195,7 @@ class DNAPipelineAnimation(Scene):
             color=GREEN, fill_color=GREEN, fill_opacity=0.25, stroke_width=2
         ).move_to(target_class_0.get_center())
 
-        pred_label_2 = Text("✓ Predizione: Classe 0 (Recettori GPCR)", font_size=12, color=GREEN, weight=BOLD)
+        pred_label_2 = Text("Predizione: Recettori GPCR", font_size=12, color=GREEN, weight=BOLD)
         pred_label_2.next_to(target_boxes, DOWN, buff=0.25)
 
         self.play(Create(arrow_to_target_2), run_time=0.7)
@@ -214,7 +209,7 @@ class DNAPipelineAnimation(Scene):
 
         # Messaggio didattico di sintesi in basso
         summary_intro = Text(
-            "L'AI analizza ogni sequenza e la smista nella classe funzionale corretta",
+            "Il modello analizza la sequenza e la smista nella classe funzionale che ritiene corretta",
             font_size=13, color=WHITE
         ).to_edge(DOWN, buff=0.4)
         self.play(Write(summary_intro), run_time=1.0)
@@ -222,7 +217,7 @@ class DNAPipelineAnimation(Scene):
 
         # Pulizia scena prima di FASE 0
         intro_all = VGroup(
-            intro_title, intro_subtitle, left_group, center_group, right_group,
+            intro_title, left_group, center_group, right_group,
             arrow_to_ai_2, arrow_to_target_2, pred_badge_2, pred_label_2, summary_intro
         )
         self.play(FadeOut(intro_all), run_time=1.0)
@@ -571,13 +566,16 @@ class DNAPipelineAnimation(Scene):
         self.play(FadeIn(full_matrix_block), run_time=1.5)
         self.wait(1.0)
 
+        feat_subscripts = ["1", "2", "i", "3504"]
+
         highlight = SurroundingRectangle(
             matrix.get_rows()[0],
             color=YELLOW, buff=0.12, corner_radius=0.05
         )
-        # feat_tag = Text("Vettore delle feature", font_size=13, color=YELLOW)
-        feat_tag = MathTex(r"\text{Vettore delle feature } \mathbf{x}_i \in \mathbb{R}^{4096}",
-                           font_size=13, color=YELLOW)
+        feat_tag = MathTex(
+            rf"\text{{Vettore delle feature }} \mathbf{{x}}_{{{feat_subscripts[0]}}} \in \mathbb{{R}}^{{4096}}",
+            font_size=13, color=YELLOW
+        )
         feat_tag.next_to(highlight, RIGHT, buff=0.5)
 
         self.play(Create(highlight), FadeIn(feat_tag), run_time=1.0)
@@ -588,10 +586,15 @@ class DNAPipelineAnimation(Scene):
                 matrix.get_rows()[i],
                 color=YELLOW, buff=0.12, corner_radius=0.05
             )
+            next_feat_tag = MathTex(
+                rf"\text{{Vettore delle feature }} \mathbf{{x}}_{{{feat_subscripts[i]}}} \in \mathbb{{R}}^{{4096}}",
+                font_size=13, color=YELLOW
+            )
+            next_feat_tag.next_to(next_highlight, RIGHT, buff=0.5)
 
             self.play(
                 Transform(highlight, next_highlight),
-                UpdateFromFunc(feat_tag, lambda t: t.next_to(highlight, RIGHT, buff=0.5)),
+                Transform(feat_tag, next_feat_tag),
                 run_time=0.8
             )
             self.wait(0.6)
