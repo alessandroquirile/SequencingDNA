@@ -10,11 +10,11 @@ class DNAPipelineAnimation(Scene):
         # ----------------------------------------------------
         # FASE INTRO: Cos'è la Classificazione del DNA?
         # ----------------------------------------------------
-        intro_title = Text("Classificare sequenze di DNA", font_size=24, color=WHITE)
-        intro_title.to_edge(UP, buff=0.4)
+        # intro_title = Text("Classificare sequenze di DNA", font_size=24, color=WHITE)
+        # intro_title.to_edge(UP, buff=0.4)
 
-        self.play(Write(intro_title), run_time=1.2)
-        self.wait(0.5)
+        # self.play(Write(intro_title), run_time=1.2)
+        # self.wait(0.5)
 
         # 1. BLOCCO SINISTRA: Sequenza DNA (Input)
         dna_input_title = Text("Sequenza 1 (Input)", font_size=13, color=TEAL, weight=BOLD)
@@ -217,7 +217,7 @@ class DNAPipelineAnimation(Scene):
 
         # Pulizia scena prima di FASE 0
         intro_all = VGroup(
-            intro_title, left_group, center_group, right_group,
+            left_group, center_group, right_group,
             arrow_to_ai_2, arrow_to_target_2, pred_badge_2, pred_label_2, summary_intro
         )
         self.play(FadeOut(intro_all), run_time=1.0)
@@ -481,40 +481,81 @@ class DNAPipelineAnimation(Scene):
         )
         self.wait(1.0)
 
-        arrow_train = Arrow(train_block.get_bottom(), train_block.get_bottom() + DOWN * 1.2, color=GREEN_B, buff=0.15)
-        fit_transform_label = Text("CountVectorizer.fit_transform()", font="Monospace", font_size=15, color=GREEN_B).next_to(
-            arrow_train, RIGHT, buff=0.1)
-        train_bow_label = Text("x_train_bow", font_size=20, color=GREEN_B).next_to(arrow_train, DOWN, buff=0.15)
+        # 1. Barriera di Isolamento tra Train e Test
+        firewall_line = DashedLine(
+            UP * 1.5, DOWN * 2.2,
+            color=BLUE_C, stroke_width=2.5, dash_length=0.12
+        )
+        firewall_label = Text("Isolamento Rigoroso", font_size=11, color=BLUE_B).next_to(firewall_line, UP, buff=0.1)
+        firewall_group = VGroup(firewall_line, firewall_label)
 
-        arrow_test = Arrow(test_block.get_bottom(), test_block.get_bottom() + DOWN * 1.2, color=RED_A, buff=0.15)
-        transform_label = Text("CountVectorizer.transform()", font="Monospace", font_size=15, color=RED_A).next_to(arrow_test, RIGHT,
-                                                                                                   buff=0.1)
-        test_bow_label = Text("x_test_bow", font_size=20, color=RED_A).next_to(arrow_test, DOWN, buff=0.15)
+        self.play(Create(firewall_line), FadeIn(firewall_label), run_time=0.8)
+        self.wait(0.5)
+
+        # 2. Train genera il Vocabolario (fit_transform)
+        arrow_train = Arrow(train_block.get_bottom(), train_block.get_bottom() + DOWN * 1.0, color=GREEN_B, buff=0.12)
+        fit_transform_label = Text("fit_transform()", font="Monospace", font_size=14, color=GREEN_B).next_to(
+            arrow_train, RIGHT, buff=0.1
+        )
+        vocab_box = RoundedRectangle(
+            corner_radius=0.08, width=3.2, height=0.7,
+            color=GREEN, fill_color="#102b1e", fill_opacity=0.85
+        )
+        vocab_txt = Text("Vocabolario (4.096 k-mers)", font_size=11, color=WHITE, weight=BOLD).move_to(vocab_box.get_center())
+        vocab_group = VGroup(vocab_box, vocab_txt).next_to(arrow_train, DOWN, buff=0.12)
+
+        self.play(Create(arrow_train), Write(fit_transform_label), FadeIn(vocab_group), run_time=1.0)
+        self.wait(0.4)
+
+        # 3. TENTATIVO DI DATA LEAKAGE (Respinto)
+        leak_arrow = CurvedArrow(
+            test_block.get_left() + DOWN * 0.2,
+            vocab_box.get_right() + UP * 0.15,
+            angle=-0.4, color=RED, stroke_width=3
+        )
+        leak_tag = Text("✗ DATA LEAKAGE!", font_size=12, color=RED, weight=BOLD).next_to(firewall_line, RIGHT, buff=0.15).shift(DOWN * 0.2)
+
+        self.play(Create(leak_arrow), FadeIn(leak_tag), run_time=0.7)
+        self.play(Indicate(leak_tag, color=RED_E, scale_factor=1.15), run_time=0.5)
+        self.play(FadeOut(leak_arrow), FadeOut(leak_tag), run_time=0.5)
+        self.wait(0.3)
+
+        # 4. Flusso corretto: Test esegue solo transform()
+        arrow_test = Arrow(test_block.get_bottom(), test_block.get_bottom() + DOWN * 1.0, color=RED_A, buff=0.12)
+        transform_label = Text("transform() [solo proiezione]", font="Monospace", font_size=13, color=RED_A).next_to(
+            arrow_test, RIGHT, buff=0.1
+        )
+        test_bow_label = Text("x_test_bow", font_size=18, color=RED_A).next_to(arrow_test, DOWN, buff=0.15)
 
         self.play(
-            Create(arrow_train), Write(fit_transform_label), Write(train_bow_label),
             Create(arrow_test), Write(transform_label), Write(test_bow_label),
-            run_time=1.2
+            run_time=1.0
         )
-        self.wait(1.0)
+        self.wait(0.5)
 
-        leakage_box = RoundedRectangle(corner_radius=0.1, width=8.5, height=0.8, color=GOLD, fill_color="#3a2e05",
-                                       fill_opacity=0.9)
-        leakage_box.move_to(DOWN * 3.0)
-        leakage_text = Text(
+        # 5. Badge esplicativo finale
+        leakage_box = RoundedRectangle(
+            corner_radius=0.1, width=9.2, height=0.9,
+            color=GOLD, fill_color="#3a2e05", fill_opacity=0.9
+        ).move_to(DOWN * 3.0)
+        leakage_t1 = Text(
             "NO DATA LEAKAGE: Il vocabolario viene appreso SOLO dal Training Set",
-            font_size=15,
-            color=GOLD,
-            weight=BOLD
-        ).move_to(leakage_box.get_center())
-        leakage_badge = VGroup(leakage_box, leakage_text)
+            font_size=13, color=GOLD, weight=BOLD
+        )
+        leakage_t2 = Text(
+            "x_test rimane al 100% invisibile durante il fit del modello",
+            font_size=11, color=GRAY_A
+        )
+        leakage_content = VGroup(leakage_t1, leakage_t2).arrange(DOWN, buff=0.08).move_to(leakage_box.get_center())
+        leakage_badge = VGroup(leakage_box, leakage_content)
 
-        self.play(FadeIn(leakage_badge, scale=0.9), run_time=1.2)
+        self.play(FadeIn(leakage_badge, scale=0.95), run_time=1.0)
         self.wait(2.5)
 
         phase2_elements = VGroup(
             title2, global_block, split_arrow_left, split_arrow_right,
-            train_block, test_block, arrow_train, fit_transform_label, train_bow_label,
+            train_block, test_block, firewall_group,
+            arrow_train, fit_transform_label, vocab_group,
             arrow_test, transform_label, test_bow_label, leakage_badge
         )
         self.play(FadeOut(phase2_elements), run_time=1.0)
