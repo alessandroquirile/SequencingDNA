@@ -6,15 +6,15 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from main import get_kmers
+from utils import get_kmers
 
 
-def main():
+def run_pipeline():
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     model_path = os.path.join(project_root, 'models', 'dna_classifier.joblib')
     data_path = os.path.join(project_root, 'data', 'raw', 'human.txt')
 
-    # 1. Caricamento del modello salvato
+    # Loading model
     print("=== 1. CARICAMENTO MODELLO ===")
     saved_data = joblib.load(model_path)
     clf = saved_data['classifier']
@@ -23,7 +23,7 @@ def main():
     k = saved_data.get('k', 6)
     print(f"Modello caricato con successo da: {model_path}\n")
 
-    # 2. Parametri ottenuti dal training
+    # Model parameters
     print("=== 2. PARAMETRI APPRESI DAL MODELLO ===")
     print(f"• Matrice dei Pesi W (coef_):       {clf.coef_.shape}  (7 classi x {clf.coef_.shape[1]} n_features)")
     print(f"• Vettore di Bias b (intercept_):   {clf.intercept_.shape}  (7 classi)")
@@ -42,25 +42,23 @@ def main():
         print(f"  [{c_id}] {class_mapping[c_id]}: {top_features}")"""
     print()
 
-    # 3. Inferenza su campioni casuali estratti dal Test Set
+    # Inference on random test samples
     print("=== 3. INFERENZA SU CAMPIONI CASUALI DEL TEST SET ===")
     df = pd.read_table(data_path)
     _, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df['class'])
-
-    # Campionamento casuale dal test set (es. 5 sequenze)
     sample_test = test_df.sample(n=5)
 
     for i, (_, row) in enumerate(sample_test.iterrows(), start=1):
         seq = row['sequence']
         true_class = int(row['class'])
 
-        # Preprocessing: estrazione 6-meri e vettorizzazione
+        # Pre-processing
         kmers = get_kmers(seq, k)
-        X = vec.transform([kmers])
+        x_train = vec.transform([kmers])
 
-        # Predizione e confidenza
-        pred_class = int(clf.predict(X)[0])
-        probabilities = clf.predict_proba(X)[0]
+        # Predictions
+        pred_class = int(clf.predict(x_train)[0])
+        probabilities = clf.predict_proba(x_train)[0]
         confidence = probabilities[pred_class] * 100
         is_correct = (true_class == pred_class)
 
@@ -74,4 +72,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run_pipeline()

@@ -7,6 +7,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 
+from utils import get_kmers
+
 CLASS_MAPPING = {
     0: 'Recettori accoppiati a proteine G',
     1: 'Tirosin-chinasi',
@@ -16,23 +18,6 @@ CLASS_MAPPING = {
     5: 'Canale ionico',
     6: 'Fattore di trascrizione'
 }
-
-
-def clean_sequence(sequence: str) -> str:
-    """Clean DNA sequence: uppercase, keep only ATCG."""
-    return ''.join(c for c in sequence.upper() if c in 'ATCG')
-
-
-def get_kmers(sequence: str, k: int = 6) -> str:
-    """Extract overlapping k-mers of length k, filtering out any with non-canonical bases."""
-    valid_bases = {'A', 'T', 'C', 'G'}
-    seq = sequence.upper()
-    kmers = [
-        seq[i:i + k]
-        for i in range(len(seq) - k + 1)
-        if set(seq[i:i + k]).issubset(valid_bases)
-    ]
-    return ' '.join(kmers)
 
 
 def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_state: int = 42, cv_folds: int = 5):
@@ -61,7 +46,7 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
     print(f"Bag-of-Words feature matrix shape: {x_train.shape} ({x_train.shape[1]} unique {k}-mers)")
 
     # Train Logistic Regression Classifier
-    classifier = LogisticRegression(max_iter=100, random_state=random_state)
+    classifier = LogisticRegression(max_iter=5000, random_state=random_state)
     classifier.fit(x_train, y_train)
 
     # Cross-validation
@@ -99,6 +84,7 @@ def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_stat
         'k': k
     }, model_path)
     print(f"\nModel and vectorizer saved to: {model_path}")
+
     return classifier, vectorizer
 
 
