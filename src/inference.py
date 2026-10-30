@@ -1,8 +1,12 @@
 import os
+import sys
+
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from main import get_kmers
 
 
 def main():
@@ -21,7 +25,7 @@ def main():
 
     # 2. Parametri ottenuti dal training
     print("=== 2. PARAMETRI APPRESI DAL MODELLO ===")
-    print(f"• Matrice dei Pesi W (coef_):       {clf.coef_.shape}  (7 classi x {clf.coef_.shape[1]} 6-meri)")
+    print(f"• Matrice dei Pesi W (coef_):       {clf.coef_.shape}  (7 classi x {clf.coef_.shape[1]} n_features)")
     print(f"• Vettore di Bias b (intercept_):   {clf.intercept_.shape}  (7 classi)")
     print(f"• Dimensione vocabolario 6-meri:   {len(vec.vocabulary_)}")
     print(f"• Iterazioni alla convergenza:     {clf.n_iter_[0]}")
@@ -51,7 +55,7 @@ def main():
         true_class = int(row['class'])
 
         # Preprocessing: estrazione 6-meri e vettorizzazione
-        kmers = ' '.join([seq[j:j + k] for j in range(len(seq) - k + 1)])
+        kmers = get_kmers(seq, k)
         X = vec.transform([kmers])
 
         # Predizione e confidenza

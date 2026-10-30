@@ -1,5 +1,5 @@
-from manim import *
 import numpy as np
+from manim import *
 
 
 class DNAPipelineAnimation(Scene):
@@ -482,13 +482,15 @@ class DNAPipelineAnimation(Scene):
         self.wait(1.0)
 
         arrow_train = Arrow(train_block.get_bottom(), train_block.get_bottom() + DOWN * 1.2, color=GREEN_B, buff=0.15)
-        fit_transform_label = Text("CountVectorizer.fit_transform()", font="Monospace", font_size=15, color=GREEN_B).next_to(
+        fit_transform_label = Text("CountVectorizer.fit_transform()", font="Monospace", font_size=15,
+                                   color=GREEN_B).next_to(
             arrow_train, RIGHT, buff=0.1)
         train_bow_label = Text("x_train_bow", font_size=20, color=GREEN_B).next_to(arrow_train, DOWN, buff=0.15)
 
         arrow_test = Arrow(test_block.get_bottom(), test_block.get_bottom() + DOWN * 1.2, color=RED_A, buff=0.15)
-        transform_label = Text("CountVectorizer.transform()", font="Monospace", font_size=15, color=RED_A).next_to(arrow_test, RIGHT,
-                                                                                                   buff=0.1)
+        transform_label = Text("CountVectorizer.transform()", font="Monospace", font_size=15, color=RED_A).next_to(
+            arrow_test, RIGHT,
+            buff=0.1)
         test_bow_label = Text("x_test_bow", font_size=20, color=RED_A).next_to(arrow_test, DOWN, buff=0.15)
 
         self.play(

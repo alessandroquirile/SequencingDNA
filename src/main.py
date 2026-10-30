@@ -1,6 +1,6 @@
 import os
-import joblib
 
+import joblib
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -24,8 +24,15 @@ def clean_sequence(sequence: str) -> str:
 
 
 def get_kmers(sequence: str, k: int = 6) -> str:
-    """Extract overlapping k-mers of length k from a sequence and join them with spaces."""
-    return ' '.join([sequence[i:i + k] for i in range(len(sequence) - k + 1)])
+    """Extract overlapping k-mers of length k, filtering out any with non-canonical bases."""
+    valid_bases = {'A', 'T', 'C', 'G'}
+    seq = sequence.upper()
+    kmers = [
+        seq[i:i + k]
+        for i in range(len(seq) - k + 1)
+        if set(seq[i:i + k]).issubset(valid_bases)
+    ]
+    return ' '.join(kmers)
 
 
 def run_pipeline(data_path: str, k: int = 6, test_size: float = 0.2, random_state: int = 42, cv_folds: int = 5):
