@@ -45,7 +45,7 @@ SequencingDNA/
 │   ├── train.py               # Training pipeline
 │   ├── inference.py           # Inference & evaluation
 │   └── utils.py               # K-mer extraction utilities
-├── dna_pipeline.py            # Alternative pipeline script
+├── dna_pipeline.py            # Manim animations script
 └── requirements.txt
 ```
 
