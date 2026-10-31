@@ -1,42 +1,89 @@
 # DNA Sequence Classification with Machine Learning
 
-This repository contains a Jupyter Notebook designed to introduce high school students to Machine Learning concepts
-through a practical example: **DNA sequence classification**.
+This repository contains Python scripts for DNA sequence classification using k-mer features and logistic regression.
 
 ## 🧬 What is DNA Sequence Classification?
 
-DNA sequence classification is the process of predicting the biological function or gene family of a known DNA sequence
-(such as identifying ion channels, transcription factors, or G-protein coupled receptors). Scientists use machine
-learning models to automatically annotate and categorize genetic sequences.
+DNA sequence classification predicts the biological function or gene family of a known DNA sequence (e.g., ion channels, transcription factors, G-protein coupled receptors).
 
-## 🤖 How Can Machine Learning Help?
+## 🤖 Approach
 
-Machine Learning (ML) allows us to recognize sequence patterns (such as k-mer frequencies) in DNA, helping in tasks like
-classifying gene families or predicting gene function. In this notebook, we break down the problem into simple steps
-that anyone can follow, even without prior programming experience!
+- **K-mer counting**: Split DNA sequences into overlapping k-mers (default k=6)
+- **Bag-of-Words**: Convert k-mer counts to numerical feature vectors
+- **Logistic Regression**: Multi-class classifier with cross-validation
 
-## 📚 What You Will Learn
+## 🚀 Quick Start
 
-In this notebook, we explore:
+### 1. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-1. **Data Analysis**: Understanding DNA sequences and preparing them for machine learning.
-2. **K-mer Counting**: Splitting DNA sequences into smaller overlapping pieces (k-mers) for feature extraction.
-3. **Bag-of-Words (BoW) Representation**: Converting DNA sequences into a numerical format that a machine learning model
-   can understand.
-4. **Model Training & Validation**: Using the **Cross-Validation Method** to test our model's performance.
+### 2. Train the model
+```bash
+python src/train.py
+```
 
-## 🚀 How to Use the Notebook
+Trains on `data/raw/human.txt`, saves model to `models/dna_classifier.joblib`.
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/alessandroquirile/SequencingDNA.git
-   ```
-2. Install the required python dependencies:
-    ```bash
-   pip install -r requirements.txt
-   ```
-3. Open the Jupyter Notebook:
-    ```bash
-   jupyter notebook notebooks/dna-classification.ipynb
-   ```
-   
+### 3. Run inference
+```bash
+python src/inference.py
+```
+
+Loads trained model, runs predictions on random test samples, shows per-class metrics and model parameters.
+
+## 📁 Project Structure
+
+```
+SequencingDNA/
+├── data/
+│   └── raw/
+│       └── human.txt          # Training data (TSV: sequence, class)
+├── models/                     # Saved models (created after training)
+├── src/
+│   ├── train.py               # Training pipeline
+│   ├── inference.py           # Inference & evaluation
+│   └── utils.py               # K-mer extraction utilities
+├── dna_pipeline.py            # Alternative pipeline script
+└── requirements.txt
+```
+
+## 📊 Data Format
+
+`human.txt` - tab-separated:
+```
+sequence    class
+ATCGATCG...  0
+GCTAGCTA...  1
+...
+```
+
+Classes (0-6):
+- 0: G-protein coupled receptors
+- 1: Tyrosine kinase
+- 2: Tyrosine phosphatase
+- 3: Synthetase
+- 4: Synthase
+- 5: Ion channel
+- 6: Transcription factor
+
+## ⚙️ Configuration
+
+Key parameters in `train.py`:
+- `k=6` - k-mer length
+- `test_size=0.2` - train/test split
+- `cv_folds=5` - cross-validation folds
+- `random_state=42` - reproducibility
+
+## 📈 Output
+
+Training prints:
+- Cross-validation F1 score
+- Test set accuracy, precision, recall, F1
+- Per-class classification report
+- Model saved to `models/dna_classifier.joblib`
+
+Inference prints:
+- Model parameters (weights, bias, vocabulary size)
+- Random test sample predictions with confidence
